@@ -150,9 +150,10 @@ public class ReceivableFrame extends JFrame implements RowSetListener {
 
 	private void createNewTableModel() throws SQLException {
 		this.listTableModel = new ListTableModel(getContentsOfListTable());
-		this.listTableModel.addEventHandlersToRowSet(this);
+//		this.listTableModel.addEventHandlersToRowSet(this);
 
-		this.receivableAppView.getListTable().setModel(listTableModel);
+		this.receivableAppView.setListTableModel(this.listTableModel);
+		this.receivableAppView.update();
 	}
 
 	private CachedRowSet getContentsOfListTable() {
@@ -185,9 +186,7 @@ public class ReceivableFrame extends JFrame implements RowSetListener {
 		try {
 			cachedRowSet.moveToCurrentRow();
 			
-//			this.listTableModel = new ListTableModel(cachedRowSet);
-			this.listTableModel.setCachedRowSet(cachedRowSet);
-			this.listTableModel.initializeListTableModel();
+			this.listTableModel = new ListTableModel(cachedRowSet);
 			
 			this.receivableAppView.setListTableModel(this.listTableModel);
 			this.receivableAppView.update();
@@ -206,7 +205,6 @@ public class ReceivableFrame extends JFrame implements RowSetListener {
 			ReceivableFrame receivableApp = new ReceivableFrame("Receivable App");
 			receivableApp.setVisible(true);
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
