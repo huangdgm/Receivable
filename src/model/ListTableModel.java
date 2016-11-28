@@ -24,15 +24,20 @@ public class ListTableModel implements TableModel {
 
 	public ListTableModel(CachedRowSet cachedRowSet) throws SQLException {
 		this.cachedRowSet = cachedRowSet;
+		
+		initializeListTableModel();
+	}
+	
+	public void initializeListTableModel() throws SQLException {
 		this.metadata = this.cachedRowSet.getMetaData();
 		this.numOfCols = this.metadata.getColumnCount();
-
+		
 		this.cachedRowSet.beforeFirst();
-
+		
 		while (this.cachedRowSet.next()) {
 			this.numOfRows++;
 		}
-
+		
 		this.cachedRowSet.beforeFirst();
 	}
 
@@ -90,11 +95,11 @@ public class ListTableModel implements TableModel {
 
 	@Override
 	public Class<?> getColumnClass(int columnIndex) {
-		if(columnIndex == 0) {
-			return Integer.class;
-		} else {
+//		if(columnIndex == 0) {
+//			return Integer.class;
+//		} else {
 			return String.class;
-		}
+//		}
 	}
 
 	@Override
@@ -106,12 +111,12 @@ public class ListTableModel implements TableModel {
 	public Object getValueAt(int rowIndex, int columnIndex) {
 		try {
 			this.cachedRowSet.absolute(rowIndex + 1);
-			Object o = this.cachedRowSet.getObject(columnIndex + 1);
+			Object obj = this.cachedRowSet.getObject(columnIndex + 1);
 
-			if (o == null) {
+			if (obj == null) {
 				return null;
 			} else {
-				return o.toString();
+				return obj.toString();
 			}
 		} catch (SQLException e) {
 			return e.toString();
