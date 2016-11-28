@@ -1,4 +1,5 @@
 package model;
+
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 
@@ -16,8 +17,8 @@ import javax.swing.table.TableModel;
  *
  */
 public class ListTableModel implements TableModel {
-	private CachedRowSet cachedRowSet = null;
-	private ResultSetMetaData metadata = null;
+	private CachedRowSet cachedRowSet;
+	private ResultSetMetaData metadata;
 	private int numOfCols = 0;
 	private int numOfRows = 0;
 
@@ -28,7 +29,6 @@ public class ListTableModel implements TableModel {
 
 		this.cachedRowSet.beforeFirst();
 
-		this.numOfRows = 0;
 		while (this.cachedRowSet.next()) {
 			this.numOfRows++;
 		}
@@ -36,35 +36,26 @@ public class ListTableModel implements TableModel {
 		this.cachedRowSet.beforeFirst();
 	}
 
-	public ListTableModel() {
-		// TODO Auto-generated constructor stub
-	}
-	
-	public CachedRowSet getCachedRowSet() {
-		return cachedRowSet;
-	}
-	
-	public void setCachedRowSet(CachedRowSet cachedRowSet) {
-		this.cachedRowSet = cachedRowSet;
-	}
-	
 	public void addEventHandlersToRowSet(RowSetListener listener) {
 		this.cachedRowSet.addRowSetListener(listener);
 	}
-	
-	public void insertRow(String purchaser, String consignee, String orderNO){
+
+	public void insertRow(String purchaser, String consignee, String orderNO) {
 		try {
 			this.cachedRowSet.moveToInsertRow();
+
 			this.cachedRowSet.updateString("purchaser", purchaser);
 			this.cachedRowSet.updateString("consignee", consignee);
 			this.cachedRowSet.updateString("orderNO", orderNO);
+
 			this.cachedRowSet.insertRow();
+
 			this.cachedRowSet.moveToCurrentRow();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public void close() {
 		try {
 			this.cachedRowSet.getStatement().close();
@@ -73,6 +64,10 @@ public class ListTableModel implements TableModel {
 			e.printStackTrace();
 		}
 	}
+	
+	protected void finalize() {
+		close();
+	} 
 
 	@Override
 	public int getRowCount() {
@@ -89,7 +84,6 @@ public class ListTableModel implements TableModel {
 		try {
 			return this.metadata.getColumnLabel(columnIndex + 1);
 		} catch (SQLException e) {
-			e.printStackTrace();
 			return e.toString();
 		}
 	}
@@ -116,8 +110,6 @@ public class ListTableModel implements TableModel {
 				return o.toString();
 			}
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 			return e.toString();
 		}
 	}
@@ -138,5 +130,13 @@ public class ListTableModel implements TableModel {
 	public void removeTableModelListener(TableModelListener l) {
 		// TODO Auto-generated method stub
 
+	}
+
+	public CachedRowSet getCachedRowSet() {
+		return cachedRowSet;
+	}
+
+	public void setCachedRowSet(CachedRowSet cachedRowSet) {
+		this.cachedRowSet = cachedRowSet;
 	}
 }

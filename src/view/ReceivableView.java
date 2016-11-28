@@ -50,19 +50,19 @@ public class ReceivableView extends JPanel {
 	public ReceivableView() {
 		setLayout(null);
 
-		listTable = new JTable(new ListTableModel());
-		listTable.setFillsViewportHeight(true);
+		listTable = new JTable();
+//		listTable.setFillsViewportHeight(true);
 		listTableScrollPane = new JScrollPane(listTable);
 		listTableScrollPane.setLocation(10, 120);
 		listTableScrollPane.setSize(1020, 700);
-		listTable.setPreferredScrollableViewportSize(new Dimension(500, 80));
+//		listTable.setPreferredScrollableViewportSize(new Dimension(500, 80));
 		// enable row sorting functionality
 		listTable.setAutoCreateRowSorter(true);
 		// Stops the JTable from recreating the TableColumnModel, which in turn
 		// preserve the attributes of the TableColumn, such as the preferred
 		// width of the columns.
-		listTable.setAutoCreateColumnsFromModel(false);
-		add(listTable);
+//		listTable.setAutoCreateColumnsFromModel(false);
+		add(listTableScrollPane);
 		
 		buttonAddRecord = new JButton("Add Record");
 		buttonAddRecord.setLocation(910, 40);
@@ -70,7 +70,7 @@ public class ReceivableView extends JPanel {
 		add(buttonAddRecord);
 		
 		buttonUpdateDatabase = new JButton("Update Database");
-		buttonUpdateDatabase.setLocation(850, 40);
+		buttonUpdateDatabase.setLocation(800, 40);
 		buttonUpdateDatabase.setSize(80, 40);
 		add(buttonUpdateDatabase);
 		

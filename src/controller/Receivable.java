@@ -158,7 +158,6 @@ public class Receivable extends JFrame implements RowSetListener {
 		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 
 		add(receivableView);
-
 	}
 
 	private void createNewTableModel() throws SQLException {
