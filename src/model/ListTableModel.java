@@ -1,6 +1,8 @@
+package model;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 
+import javax.sql.RowSetListener;
 import javax.sql.rowset.CachedRowSet;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
@@ -14,24 +16,62 @@ import javax.swing.table.TableModel;
  *
  */
 public class ListTableModel implements TableModel {
-	private CachedRowSet recordRowSet;
-	private ResultSetMetaData metadata;
-	private int numOfCols;
-	private int numOfRows;
+	private CachedRowSet cachedRowSet = null;
+	private ResultSetMetaData metadata = null;
+	private int numOfCols = 0;
+	private int numOfRows = 0;
 
-	public ListTableModel(CachedRowSet recordRowSet) throws SQLException {
-		this.recordRowSet = recordRowSet;
-		this.metadata = this.recordRowSet.getMetaData();
+	public ListTableModel(CachedRowSet cachedRowSet) throws SQLException {
+		this.cachedRowSet = cachedRowSet;
+		this.metadata = this.cachedRowSet.getMetaData();
 		this.numOfCols = this.metadata.getColumnCount();
 
-		this.recordRowSet.beforeFirst();
+		this.cachedRowSet.beforeFirst();
 
 		this.numOfRows = 0;
-		while (this.recordRowSet.next()) {
+		while (this.cachedRowSet.next()) {
 			this.numOfRows++;
 		}
 
-		this.recordRowSet.beforeFirst();
+		this.cachedRowSet.beforeFirst();
+	}
+
+	public ListTableModel() {
+		// TODO Auto-generated constructor stub
+	}
+	
+	public CachedRowSet getCachedRowSet() {
+		return cachedRowSet;
+	}
+	
+	public void setCachedRowSet(CachedRowSet cachedRowSet) {
+		this.cachedRowSet = cachedRowSet;
+	}
+	
+	public void addEventHandlersToRowSet(RowSetListener listener) {
+		this.cachedRowSet.addRowSetListener(listener);
+	}
+	
+	public void insertRow(String purchaser, String consignee, String orderNO){
+		try {
+			this.cachedRowSet.moveToInsertRow();
+			this.cachedRowSet.updateString("purchaser", purchaser);
+			this.cachedRowSet.updateString("consignee", consignee);
+			this.cachedRowSet.updateString("orderNO", orderNO);
+			this.cachedRowSet.insertRow();
+			this.cachedRowSet.moveToCurrentRow();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void close() {
+		try {
+			this.cachedRowSet.getStatement().close();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	@Override
@@ -67,8 +107,8 @@ public class ListTableModel implements TableModel {
 	@Override
 	public Object getValueAt(int rowIndex, int columnIndex) {
 		try {
-			this.recordRowSet.absolute(rowIndex + 1);
-			Object o = this.recordRowSet.getObject(columnIndex + 1);
+			this.cachedRowSet.absolute(rowIndex + 1);
+			Object o = this.cachedRowSet.getObject(columnIndex + 1);
 
 			if (o == null) {
 				return null;
