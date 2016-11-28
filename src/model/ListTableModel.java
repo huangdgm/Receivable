@@ -51,6 +51,7 @@ public class ListTableModel implements TableModel {
 			this.cachedRowSet.insertRow();
 
 			this.cachedRowSet.moveToCurrentRow();
+			// We leave the acceptChanges() in the controller.
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -60,7 +61,6 @@ public class ListTableModel implements TableModel {
 		try {
 			this.cachedRowSet.getStatement().close();
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -90,7 +90,11 @@ public class ListTableModel implements TableModel {
 
 	@Override
 	public Class<?> getColumnClass(int columnIndex) {
-		return String.class;
+		if(columnIndex == 0) {
+			return Integer.class;
+		} else {
+			return String.class;
+		}
 	}
 
 	@Override

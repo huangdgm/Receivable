@@ -20,11 +20,13 @@ import javax.swing.JOptionPane;
 import com.sun.rowset.CachedRowSetImpl;
 
 import model.ListTableModel;
-import view.ReceivableView;
+import view.ReceivableAppView;
 
-public class Receivable extends JFrame implements RowSetListener {
+public class ReceivableApp extends JFrame implements RowSetListener {
+	private static final long serialVersionUID = 1L;
+	
 	private ListTableModel listTableModel;
-	private ReceivableView receivableView;
+	private ReceivableAppView receivableAppView;
 	private Connection connection;
 	// private Connection connection = null;
 	// private Statement statement = null;
@@ -66,28 +68,20 @@ public class Receivable extends JFrame implements RowSetListener {
 	// new Receivable().readDataBase();
 	// }
 
-	public Receivable(String title) throws SQLException {
+	public ReceivableApp(String title) throws SQLException {
 		super(title);
+		
+		CachedRowSet cachedRowSet = getContentsOfListTable();
+		listTableModel = new ListTableModel(cachedRowSet);
+		listTableModel.addEventHandlersToRowSet(this);
 
-		receivableView = new ReceivableView();
+		receivableAppView = new ReceivableAppView(listTableModel);
 
 		try {
 			connection = DriverManager.getConnection("jdbc:mysql://localhost/record?user=administrator&password=passw0rd");
 		} catch (SQLException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-
-		// listTableModel.setCachedRowSet(getContentsOfListTable());
-
-		// try {
-		// listTableModel = new
-		// ListTableModel(listTableModel.getCachedRowSet());
-		// receivableView.getListTable().setModel(listTableModel);
-		// } catch (SQLException e) {
-		// // TODO Auto-generated catch block
-		// e.printStackTrace();
-		// }
 
 		this.addWindowListener(new WindowAdapter() {
 			@Override
@@ -102,32 +96,28 @@ public class Receivable extends JFrame implements RowSetListener {
 			}
 		});
 
-		CachedRowSet cachedRowSet = getContentsOfListTable();
-		listTableModel = new ListTableModel(cachedRowSet);
-		listTableModel.addEventHandlersToRowSet(this);
+		receivableAppView.getListTable().setModel(listTableModel);
 
-		receivableView.getListTable().setModel(listTableModel);
-
-		receivableView.getButtonAddRecord().addActionListener(new ActionListener() {
+		receivableAppView.getButtonAddRecord().addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				JOptionPane.showMessageDialog(Receivable.this, new String[] { "Adding the following row:", "purchaser name: [" + receivableView.getTextFieldPurchaser().getText() + "]",
-						"consignee name: [" + receivableView.getTextFieldConsignee().getText() + "]", "order NO: [" + receivableView.getTextFieldOrderNO().getText() + "]", });
+				JOptionPane.showMessageDialog(ReceivableApp.this, new String[] { "Adding the following row:", "purchaser name: [" + receivableAppView.getTextFieldPurchaser().getText() + "]",
+						"consignee name: [" + receivableAppView.getTextFieldConsignee().getText() + "]", "order NO: [" + receivableAppView.getTextFieldOrderNO().getText() + "]", });
 
 				String purchaser;
 				String consignee;
 				String orderNO;
 
-				purchaser = receivableView.getTextFieldPurchaser().getText().trim();
-				consignee = receivableView.getTextFieldConsignee().getText().trim();
-				orderNO = receivableView.getTextFieldOrderNO().getText().trim();
+				purchaser = receivableAppView.getTextFieldPurchaser().getText().trim();
+				consignee = receivableAppView.getTextFieldConsignee().getText().trim();
+				orderNO = receivableAppView.getTextFieldOrderNO().getText().trim();
 
 				listTableModel.insertRow(purchaser, consignee, orderNO);
 			}
 		});
 
-		receivableView.getButtonUpdateDatabase().addActionListener(new ActionListener() {
+		receivableAppView.getButtonUpdateDatabase().addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -144,7 +134,6 @@ public class Receivable extends JFrame implements RowSetListener {
 					}
 				}
 			}
-
 		});
 		
 		setSize(1460, 860);
@@ -157,14 +146,14 @@ public class Receivable extends JFrame implements RowSetListener {
 		setResizable(false);
 		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 
-		add(receivableView);
+		add(receivableAppView);
 	}
 
 	private void createNewTableModel() throws SQLException {
 		listTableModel = new ListTableModel(getContentsOfListTable());
 		listTableModel.addEventHandlersToRowSet(this);
 
-		receivableView.getListTable().setModel(listTableModel);
+		receivableAppView.getListTable().setModel(listTableModel);
 	}
 
 	private CachedRowSet getContentsOfListTable() {
@@ -178,10 +167,9 @@ public class Receivable extends JFrame implements RowSetListener {
 			cachedRowSet.setConcurrency(ResultSet.CONCUR_UPDATABLE);
 			cachedRowSet.setUsername("administrator");
 			cachedRowSet.setPassword("passw0rd");
-
 			cachedRowSet.setUrl("jdbc:mysql://localhost/record?relaxAutoCommit=true");
-
 			cachedRowSet.setCommand("select * from list");
+			
 			cachedRowSet.execute();
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
@@ -202,9 +190,9 @@ public class Receivable extends JFrame implements RowSetListener {
 		try {
 			cachedRowSet.moveToCurrentRow();
 			listTableModel = new ListTableModel(cachedRowSet);
-			receivableView.getListTable().setModel(listTableModel);
+			receivableAppView.getListTable().setModel(listTableModel);
 		} catch (SQLException e) {
-			JOptionPane.showMessageDialog(Receivable.this, new String[] { e.getClass().getName() + ": ", e.getMessage() });
+			JOptionPane.showMessageDialog(ReceivableApp.this, new String[] { e.getClass().getName() + ": ", e.getMessage() });
 		}
 	}
 
@@ -215,8 +203,8 @@ public class Receivable extends JFrame implements RowSetListener {
 	public static void main(String[] args) {
 
 		try {
-			Receivable receivable = new Receivable("Receivable App");
-			receivable.setVisible(true);
+			ReceivableApp receivableApp = new ReceivableApp("Receivable App");
+			receivableApp.setVisible(true);
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
